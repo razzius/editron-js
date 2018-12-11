@@ -1,5 +1,5 @@
 const { app, BrowserWindow } = require('electron');
-const electronDetach = require('electron-detach');
+const electronDetach = require('@razzi/electron-detach');
 
 
 console.log('arg')
@@ -87,6 +87,5 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
     window2.loadURL(`file://${__dirname}/index.html`);
   } else {
     console.log('sam pa')
-
   }
 })
