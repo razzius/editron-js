@@ -3,17 +3,36 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+<style>
+textarea {
+    height: 100%;
+}
+
+</style>
   </head>
   <body>
     hey there!!!
     <textarea id="text">were</textarea>
+    <button disabled>save</button>
   </body>
   <script>
+const fs = require('fs')
+let filename = null
+
+document.querySelector('button').onclick = function() {
+    fs.writeFile(filename, document.getElementById('text').value, (err) => {
+        if (err) {
+            throw err
+        }
+        console.log('saved')
+    })
+}
 
 require('electron').ipcRenderer.on('open-file', (event, message) => {
-  console.log(message)
+  document.querySelector('button').removeAttribute('disabled')
 
-  require('fs').readFile(message, 'utf-8', (err, data) => {
+  filename = message
+  fs.readFile(message, 'utf-8', (err, data) => {
       if (err) {
           console.log('bad file', err)
       }

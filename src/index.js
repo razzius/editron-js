@@ -1,3 +1,4 @@
+// 4
 const { app, BrowserWindow } = require('electron');
 const electronDetach = require('@razzi/electron-detach');
 
