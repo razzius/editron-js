@@ -2,9 +2,6 @@ const { app, BrowserWindow } = require('electron');
 const electronDetach = require('@razzi/electron-detach');
 
 
-console.log('arg')
-console.log(process.argv)
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
@@ -24,6 +21,11 @@ const createWindow = () => {
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('open-file', process.argv[2])
+    console.log('did send', process.argv[2])
+  })
+
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 
@@ -34,18 +36,12 @@ const createWindow = () => {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-if (electronDetach()) {
-  app.on('ready', createWindow);
-} else {
-  console.log(
-    'it over'
-  )
-}
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On OS X it is common for applications and their menu bar
@@ -73,7 +69,13 @@ if (!gotTheLock) {
   return
 }
 
-app.on('second-instance', (event, commandLine, workingDirectory) => {
+if (electronDetach()) {
+  app.on('ready', createWindow);
+} else {
+  console.log('it over')
+}
+
+app.on('second-instance', (event, argv, workingDirectory) => {
   // Someone tried to run a second instance, we should focus our window.
   console.log('another')
   console.log(workingDirectory)
@@ -81,11 +83,9 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
     if (mainWindow.isMinimized()) mainWindow.restore()
     mainWindow.focus()
   }
+  mainWindow.webContents.send('open-file', argv[2])
 
-  if (appPath !== workingDirectory) {
-    const window2 = new BrowserWindow({ width: 800, height: 600 })
-    window2.loadURL(`file://${__dirname}/index.html`);
-  } else {
+  if (appPath === workingDirectory) {
     console.log('sam pa')
   }
 })
